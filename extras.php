@@ -1,0 +1,1 @@
+A la clase adopciones agregar atributos y generar una carga en el Db luego de la adopcion. 

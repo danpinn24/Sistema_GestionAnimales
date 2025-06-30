@@ -73,7 +73,7 @@ class Animal {
 
     // Método para mostrar información del animal
     public function __toString() {
-        return "ID: {$this->id} - Nombre: {$this->nombre} - Especie: {$this->especie} - Estado: {$this->estado}";
+        return "ID: {$this->id} - Nombre: {$this->nombre} - Especie: {$this->especie} -  Fecha Ingreso: {$this->fechaIngreso} - Estado: {$this->estado}";
     }
 }
 
