@@ -32,7 +32,7 @@ class Menu {
         return $this->opciones[$entrada];
     }
 
-    // ====== AQUÍ VAN LOS MENÚS ======
+    
     static function getMenuPrincipal() {
         $menu = new Menu("Menú Principal");
         $menu->addOpcion(new Opcion("Salir", "salir"));

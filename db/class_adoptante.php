@@ -22,7 +22,7 @@ class Adoptante {
         $this->requisitosCumplidos = $requisitosCumplidos;
     }
 
-    // Método original tuyo, muy claro
+
     public function mostrarPerfilLimpio() {
         echo "===== Perfil del Adoptante =====" . PHP_EOL;
         echo "ID: " . $this->id . PHP_EOL;
@@ -35,7 +35,7 @@ class Adoptante {
         echo PHP_EOL;
     }
 
-    // Método mágico para resumen rápido
+   
     public function __toString() {
         return "ID: {$this->id} - Nombre: {$this->nombre} - Requisitos: " . ($this->requisitosCumplidos ? 'Sí' : 'No');
     }

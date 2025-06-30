@@ -1,7 +1,7 @@
 <?php
 require_once('./libreria/util.php');
 require_once('./libreria/menu.php');
-require_once('./db/loadDatos.php'); // crea $db, carga animales y adoptantes
+require_once('./db/loadDatos.php'); 
 require_once('./db/class_adopcion.php');
 
 // === FUNCIONES PRINCIPALES ===
@@ -81,7 +81,7 @@ function realizarAdopcion() {
 function registrarAnimal() {
     mostrar("===== Registrar Nuevo Animal =====");
     mostrar("Función: Registrar nuevo animal (pendiente de implementar)");
-    // Aquí iría la lógica para solicitar los datos del nuevo animal y agregarlo a $db
+   
     leer("\nPresione ENTER para continuar...");
 }
 
@@ -165,7 +165,7 @@ function menuAdopciones() {
 
 // Función auxiliar para ejecutar cualquier menú
 function ejecutarMenu($menu) {
-    global $db; // Asegúrate de que $db sea accesible dentro de ejecutarMenu si alguna función llamada directamente la necesita
+    global $db; 
     do {
         $opcion = $menu->elegir();
         if ($opcion->getNombre() === 'Volver' || $opcion->getNombre() === 'Salir') {
