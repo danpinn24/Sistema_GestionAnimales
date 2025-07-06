@@ -1,6 +1,6 @@
 <?php
-require_once "class_adoptante.php";
-require_once "class_animales.php";
+require_once "adoptante.php";
+require_once "animal.php";
 
 class Adopciones {
     public function realizarAdopcion($animales, $adoptantes) {

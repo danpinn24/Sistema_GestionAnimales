@@ -1,7 +1,7 @@
 <?php
 require_once('./db/class_db.php');
-require_once('./db/class_animales.php');
-require_once('./db/class_adoptante.php');
+require_once('./db/animal.php');
+require_once('./db/adoptante.php');
 
 $db = new DB();
 
