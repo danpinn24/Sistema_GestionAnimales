@@ -63,5 +63,37 @@ public function eliminarAnimal($indice) {
     }
 }
 
+public function modificarAdoptantePorId($id, $nuevosDatos) {
+    foreach ($this->adoptantes as $adoptante) {
+        if ($adoptante->getId() == $id) {
+            if (isset($nuevosDatos['nombre'])) {
+                $adoptante->setNombre($nuevosDatos['nombre']);
+            }
+            if (isset($nuevosDatos['dni'])) {
+                $adoptante->setDni($nuevosDatos['dni']);
+            }
+            if (isset($nuevosDatos['direccion'])) {
+                $adoptante->setDireccion($nuevosDatos['direccion']);
+            }
+            if (isset($nuevosDatos['telefono'])) {
+                $adoptante->setTelefono($nuevosDatos['telefono']);
+            }
+            if (isset($nuevosDatos['email'])) {
+                $adoptante->setEmail($nuevosDatos['email']);
+            }
+            if (isset($nuevosDatos['requisitosCumplidos'])) {
+                $adoptante->setRequisitosCumplidos($nuevosDatos['requisitosCumplidos']);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+public function eliminarAdoptante($indice) {
+    if (isset($this->adoptantes[$indice])) {
+        array_splice($this->adoptantes, $indice, 1);
+    }
+}
 
 }

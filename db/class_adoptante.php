@@ -70,7 +70,27 @@ class Adoptante {
     }
 
     // Setters
-    public function setRequisitosCumplidos($valor) {
+     public function setRequisitosCumplidos($valor) {
         $this->requisitosCumplidos = $valor;
+    }
+
+    public function setNombre($nombre) {
+        $this->nombre = $nombre;
+    }
+
+    public function setDni($dni) {
+        $this->dni = $dni;
+    }
+
+    public function setDireccion($direccion) {
+        $this->direccion = $direccion;
+    }
+
+    public function setTelefono($telefono) {
+        $this->telefono = $telefono;
+    }
+
+    public function setEmail($email) {
+        $this->email = $email;
     }
 }

@@ -76,8 +76,7 @@ function realizarAdopcion() {
     leer("\nPresione ENTER para continuar...");
 }
 
-// === FUNCIONES DE GESTIÓN DE ANIMALES (PENDIENTES DE IMPLEMENTAR LÓGICA) ===
-
+// === FUNCIONES DE GESTIÓN DE ANIMALES === //
 
 
 function registrarAnimal() {
@@ -299,35 +298,204 @@ function verDetallesAnimal() {
     leer("\nPresione ENTER para continuar...");
 }
 // === FUNCIONES DE GESTIÓN DE ADOPTANTES (PENDIENTES DE IMPLEMENTAR LÓGICA) ===
-
 function registrarAdoptante() {
+    global $db; 
+
     mostrar("===== Registrar Nuevo Adoptante =====");
-    mostrar("Función: Registrar nuevo adoptante (pendiente de implementar)");
-    // Aquí iría la lógica para solicitar los datos del nuevo adoptante y agregarlo a $db
+    mostrar("Ingrese el nombre del adoptante:");
+    $nombre = leer();
+
+    mostrar("Ingrese el DNI del adoptante:");
+    $dni = leer();
+
+    mostrar("Ingrese la dirección del adoptante:");
+    $direccion = leer();
+
+    mostrar("Ingrese el teléfono del adoptante:");
+    $telefono = leer();
+
+    mostrar("Ingrese el email del adoptante:");
+    $email = leer();
+
+    $requisitosCumplidos = false;
+    do {
+        mostrar("¿Cumple con los requisitos para adoptar? (s/n):");
+        $respuesta = strtolower(leer());
+        if ($respuesta === 's') {
+            $requisitosCumplidos = true;
+            break;
+        } elseif ($respuesta === 'n') {
+            $requisitosCumplidos = false;
+            break;
+        } else {
+            mostrar("Respuesta inválida. Por favor, ingrese 's' o 'n'.");
+        }
+    } while (true);
+    
+    $nuevoAdoptante = new Adoptante(
+        $nombre,
+        $dni,
+        $direccion,
+        $telefono,
+        $email,
+        $requisitosCumplidos
+    );
+
+    $db->agregarAdoptante($nuevoAdoptante); 
+
+    mostrar("\nAdoptante '" . $nuevoAdoptante->getNombre() . "' (ID: " . $nuevoAdoptante->getId() . ") registrado con éxito.");
+
     leer("\nPresione ENTER para continuar...");
 }
 
 function modificarAdoptante() {
+    global $db;
     mostrar("===== Modificar Adoptante =====");
-    mostrar("Función: Modificar un adoptante (pendiente de implementar)");
-    // Aquí iría la lógica para buscar un adoptante por ID/DNI y modificar sus datos
+
+    if (empty($db->getAdoptantes())) {
+        mostrar("No hay adoptantes registrados.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    mostrar("Ingrese el ID del adoptante a modificar:");
+    $id = (int) leer();
+
+    // Buscar el adoptante
+    $adoptanteEncontrado = null;
+    foreach ($db->getAdoptantes() as $adoptante) {
+        if ($adoptante->getId() == $id) {
+            $adoptanteEncontrado = $adoptante;
+            break;
+        }
+    }
+
+    if (!$adoptanteEncontrado) {
+        mostrar("No se encontró un adoptante con ese ID.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    // Mostrar valores actuales y permitir modificar
+    mostrar("Deje en blanco para mantener el valor actual.");
+
+    $nombre = leer("Nombre [{$adoptanteEncontrado->getNombre()}]:");
+    $dni = leer("DNI [{$adoptanteEncontrado->getDni()}]:");
+    $direccion = leer("Dirección [{$adoptanteEncontrado->getDireccion()}]:");
+    $telefono = leer("Teléfono [{$adoptanteEncontrado->getTelefono()}]:");
+    $email = leer("Email [{$adoptanteEncontrado->getEmail()}]:");
+    
+    $requisitosActuales = $adoptanteEncontrado->cumpleRequisitos() ? 'Sí' : 'No';
+    $requisitosInput = leer("¿Cumple requisitos? (s/n) [{$requisitosActuales}]:");
+    $requisitosCumplidos = $adoptanteEncontrado->cumpleRequisitos(); // Mantener el valor actual por defecto
+    if (strtolower($requisitosInput) === 's') {
+        $requisitosCumplidos = true;
+    } elseif (strtolower($requisitosInput) === 'n') {
+        $requisitosCumplidos = false;
+    }
+
+
+    $nuevosDatos = [
+        'nombre' => $nombre !== '' ? $nombre : $adoptanteEncontrado->getNombre(),
+        'dni' => $dni !== '' ? $dni : $adoptanteEncontrado->getDni(),
+        'direccion' => $direccion !== '' ? $direccion : $adoptanteEncontrado->getDireccion(),
+        'telefono' => $telefono !== '' ? $telefono : $adoptanteEncontrado->getTelefono(),
+        'email' => $email !== '' ? $email : $adoptanteEncontrado->getEmail(),
+        'requisitosCumplidos' => $requisitosCumplidos
+    ];
+
+    $db->modificarAdoptantePorId($id, $nuevosDatos);
+
+    mostrar("✅ Adoptante modificado con éxito.");
     leer("\nPresione ENTER para continuar...");
 }
 
 function borrarAdoptante() {
+    global $db;
     mostrar("===== Borrar Adoptante =====");
-    mostrar("Función: Borrar un adoptante (pendiente de implementar)");
-    // Aquí iría la lógica para buscar un adoptante por ID/DNI y eliminarlo de $db
+
+    $adoptantes = $db->getAdoptantes();
+
+    if (empty($adoptantes)) {
+        mostrar("No hay adoptantes registrados para borrar.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    mostrar("Ingrese el ID del adoptante a borrar:");
+    $id = (int) leer();
+
+    $encontrado = false;
+
+    foreach ($adoptantes as $indice => $adoptante) {
+        if ($adoptante->getId() === $id) {
+            $nombre = $adoptante->getNombre();
+            mostrar("¿Estás segura/o de que querés borrar a '$nombre'? (s/n)");
+            $confirmar = strtolower(leer());
+
+            if ($confirmar === 's') {
+                $db->eliminarAdoptante($indice);
+                mostrar("✅ Adoptante '$nombre' eliminado con éxito.");
+            } else {
+                mostrar("❌ Operación cancelada.");
+            }
+
+            $encontrado = true;
+            break;
+        }
+    }
+
+    if (!$encontrado) {
+        mostrar("No se encontró ningún adoptante con ese ID.");
+    }
+
     leer("\nPresione ENTER para continuar...");
 }
 
 function verDetallesAdoptante() {
+    global $db; 
+
     mostrar("===== Ver Detalles de Adoptante =====");
-    mostrar("Función: Ver detalles de un adoptante (pendiente de implementar)");
-    // Aquí iría la lógica para solicitar un ID/DNI y mostrar el perfil completo del adoptante
+
+    if (empty($db->getAdoptantes())) {
+        mostrar("No hay adoptantes registrados para ver sus detalles.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    mostrar("Ingrese el nombre o ID del adoptante que desea ver:");
+    $busqueda = leer();
+
+    $adoptanteEncontrado = null;
+
+    if (is_numeric($busqueda)) {
+        $idBuscado = (int)$busqueda;
+        foreach ($db->getAdoptantes() as $adoptante) {
+            if ($adoptante->getId() === $idBuscado) {
+                $adoptanteEncontrado = $adoptante;
+                break;
+            }
+        }
+    }
+
+    if ($adoptanteEncontrado === null) {
+        $busquedaLower = strtolower($busqueda);
+        foreach ($db->getAdoptantes() as $adoptante) {
+            if (strtolower($adoptante->getNombre()) === $busquedaLower || strtolower($adoptante->getDni()) === $busquedaLower) {
+                $adoptanteEncontrado = $adoptante;
+                break;
+            }
+        }
+    }
+
+    if ($adoptanteEncontrado) {
+        $adoptanteEncontrado->mostrarPerfilLimpio();
+    } else {
+        mostrar("No se encontró ningún adoptante con el nombre, DNI o ID: '" . $busqueda . "'");
+    }
+
     leer("\nPresione ENTER para continuar...");
 }
-
 // === FUNCIONES DE GESTIÓN DE ADOPCIONES ADICIONALES (PENDIENTES DE IMPLEMENTAR LÓGICA) ===
 
 function verHistorialAdopciones() {
