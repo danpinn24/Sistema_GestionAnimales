@@ -78,10 +78,10 @@ function realizarAdopcion() {
 
 // === FUNCIONES DE GESTIÓN DE ANIMALES (PENDIENTES DE IMPLEMENTAR LÓGICA) ===
 
-// ... (resto de tu código y includes)
+
 
 function registrarAnimal() {
-    global $db; // Accede a la instancia global de tu "base de datos"
+    global $db; 
 
     mostrar("===== Registrar Nuevo Animal =====");
 
@@ -116,7 +116,7 @@ function registrarAnimal() {
     mostrar("Ingrese el estado de adopción (ej. 'Listo para adopcion', 'En proceso', 'Adoptado'):");
     $estado = leer();
 
-    // Crear un nuevo objeto Animal
+  
     $nuevoAnimal = new Animal(
         $nombre,
         $especie,
@@ -128,8 +128,8 @@ function registrarAnimal() {
         $estado
     );
 
-    // ¡Aquí está el cambio! Usamos 'agregarAnimal' en lugar de 'addAnimal'
-    $db->agregarAnimal($nuevoAnimal); // <--- CAMBIO AQUÍ
+   
+    $db->agregarAnimal($nuevoAnimal); 
 
     mostrar("\nAnimal '" . $nuevoAnimal->getNombre() . "' (ID: " . $nuevoAnimal->getId() . ") registrado con éxito.");
 
@@ -137,23 +137,108 @@ function registrarAnimal() {
 }
 
 function modificarAnimal() {
+    global $db;
     mostrar("===== Modificar Animal =====");
-    mostrar("Función: Modificar un animal (pendiente de implementar)");
-    // Aquí iría la lógica para buscar un animal por ID/nombre y modificar sus datos
+
+    if (empty($db->getAnimales())) {
+        mostrar("No hay animales registrados.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    mostrar("Ingrese el ID del animal a modificar:");
+    $id = (int) leer();
+
+    // Buscar el animal
+    $animalEncontrado = null;
+    foreach ($db->getAnimales() as $animal) {
+        if ($animal->getId() == $id) {
+            $animalEncontrado = $animal;
+            break;
+        }
+    }
+
+    if (!$animalEncontrado) {
+        mostrar("No se encontró un animal con ese ID.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    // Mostrar valores actuales y permitir modificar
+    mostrar("Deje en blanco para mantener el valor actual.");
+
+    $nombre = leer("Nombre [{$animalEncontrado->getNombre()}]:");
+    $especie = leer("Especie [{$animalEncontrado->getEspecie()}]:");
+    $raza = leer("Raza [{$animalEncontrado->getRaza()}]:");
+    $edad = leer("Edad [{$animalEncontrado->getEdad()}]:");
+    $sexo = leer("Sexo [{$animalEncontrado->getSexo()}]:");
+    $caracteristicas = leer("Características físicas [{$animalEncontrado->getCaracteristicasFisicas()}]:");
+    $estado = leer("Estado de adopción [{$animalEncontrado->getEstado()}]:");
+
+    $nuevosDatos = [
+        'nombre' => $nombre !== '' ? $nombre : $animalEncontrado->getNombre(),
+        'especie' => $especie !== '' ? $especie : $animalEncontrado->getEspecie(),
+        'raza' => $raza !== '' ? $raza : $animalEncontrado->getRaza(),
+        'edad' => is_numeric($edad) ? (int)$edad : $animalEncontrado->getEdad(),
+        'sexo' => $sexo !== '' ? $sexo : $animalEncontrado->getSexo(),
+        'caracteristicasFisicas' => $caracteristicas !== '' ? $caracteristicas : $animalEncontrado->getCaracteristicasFisicas(),
+        'estado' => $estado !== '' ? $estado : $animalEncontrado->getEstado()
+    ];
+
+    $db->modificarAnimalPorId($id, $nuevosDatos);
+
+    mostrar("✅ Animal modificado con éxito.");
     leer("\nPresione ENTER para continuar...");
 }
 
+
 function borrarAnimal() {
+    global $db;
     mostrar("===== Borrar Animal =====");
-    mostrar("Función: Borrar un animal (pendiente de implementar)");
-    // Aquí iría la lógica para buscar un animal por ID/nombre y eliminarlo de $db
+
+    $animales = $db->getAnimales();
+
+    if (empty($animales)) {
+        mostrar("No hay animales registrados para borrar.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    mostrar("Ingrese el ID del animal a borrar:");
+    $id = (int) leer();
+
+    $encontrado = false;
+
+    foreach ($animales as $indice => $animal) {
+        if ($animal->getId() === $id) {
+            $nombre = $animal->getNombre();
+            // Confirmación simple (opcional)
+            mostrar("¿Estás segura/o de que querés borrar a '$nombre'? (s/n)");
+            $confirmar = strtolower(leer());
+
+            if ($confirmar === 's') {
+                $db->eliminarAnimal($indice);
+                mostrar("✅ Animal '$nombre' eliminado con éxito.");
+            } else {
+                mostrar("❌ Operación cancelada.");
+            }
+
+            $encontrado = true;
+            break;
+        }
+    }
+
+    if (!$encontrado) {
+        mostrar("No se encontró ningún animal con ese ID.");
+    }
+
     leer("\nPresione ENTER para continuar...");
 }
 
 // En tu main.php o donde tengas las funciones del menú
 
 function verDetallesAnimal() {
-    global $db; // Aseguramos el acceso a la instancia de la "base de datos"
+    global $db; 
 
     mostrar("===== Ver Detalles de Animal =====");
 

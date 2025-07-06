@@ -70,6 +70,32 @@ class Animal {
     public function setNombre($nombre) {
         $this->nombre = $nombre;
     }
+    // En clase Animal, debajo de los setters existentes:
+
+public function setEspecie($especie) {
+    $this->especie = $especie;
+}
+
+public function setRaza($raza) {
+    $this->raza = $raza;
+}
+
+public function setEdad($edad) {
+    $this->edad = $edad;
+}
+
+public function setSexo($sexo) {
+    $this->sexo = $sexo;
+}
+
+public function setCaracteristicasFisicas($caracteristicasFisicas) {
+    $this->caracteristicasFisicas = $caracteristicasFisicas;
+}
+
+public function setFechaIngreso($fechaIngreso) {
+    $this->fechaIngreso = $fechaIngreso;
+}
+
 
     // Método para mostrar información del animal
     public function __toString() {
