@@ -2,8 +2,45 @@
 require_once "adoptante.php";
 require_once "animal.php";
 
-class Adopciones {
-    public function realizarAdopcion($animales, $adoptantes) {
+class Adopcion { // Renombrada de Adopciones a Adopcion (singular)
+    private static $ultimoId = 0;
+    private $idAdopcion;
+    private $idAnimal;
+    private $idAdoptante;
+    private $fechaAdopcion;
+
+    public function __construct($idAnimal, $idAdoptante, $fechaAdopcion) {
+        self::$ultimoId++;
+        $this->idAdopcion = self::$ultimoId;
+        $this->idAnimal = $idAnimal;
+        $this->idAdoptante = $idAdoptante;
+        $this->fechaAdopcion = $fechaAdopcion;
+    }
+
+    // Getters
+    public function getIdAdopcion() {
+        return $this->idAdopcion;
+    }
+
+    public function getIdAnimal() {
+        return $this->idAnimal;
+    }
+
+    public function getIdAdoptante() {
+        return $this->idAdoptante;
+    }
+
+    public function getFechaAdopcion() {
+        return $this->fechaAdopcion;
+    }
+
+    public function __toString() {
+        return "ID Adopción: {$this->idAdopcion} - Animal ID: {$this->idAnimal} - Adoptante ID: {$this->idAdoptante} - Fecha: {$this->fechaAdopcion}";
+    }
+}
+
+class AdopcionesManager { // Nueva clase para gestionar el proceso de adopción
+    public function realizarAdopcion($animales, $adoptantes, $db) { // Pasamos $db para guardar la adopción
         echo "\n===== REALIZAR ADOPCIÓN =====\n";
 
         // Paso 1: Mostrar animales listos para adopción
@@ -22,8 +59,8 @@ class Adopciones {
         }
 
         echo "Seleccione número de animal: ";
-        $numAnimal = intval(trim(fgets(STDIN))) - 1;
-        $animal = $animales[$numAnimal] ?? null;
+        $numAnimalIndex = intval(trim(fgets(STDIN))) - 1;
+        $animal = $listos[$numAnimalIndex] ?? null; // Obtener de $listos, no de $animales directamente
 
         if (!$animal || strtolower($animal->getEstado()) !== 'listo para adopcion') {
             echo "Selección inválida.\n";
@@ -36,7 +73,7 @@ class Adopciones {
         foreach ($adoptantes as $i => $adoptante) {
             if ($adoptante->cumpleRequisitos()) {
                 $habilitados[] = $adoptante;
-                echo ($i + 1) . ". " . $adoptante . "\n";
+               echo (count($habilitados)) . ". " . $adoptante . "\n";
             }
         }
 
@@ -46,8 +83,8 @@ class Adopciones {
         }
 
         echo "Seleccione número de adoptante: ";
-        $numAdoptante = intval(trim(fgets(STDIN))) - 1;
-        $adoptante = $adoptantes[$numAdoptante] ?? null;
+        $numAdoptanteIndex = intval(trim(fgets(STDIN))) - 1;
+        $adoptante = $habilitados[$numAdoptanteIndex] ?? null; // Obtener de $habilitados, no de $adoptantes directamente
 
         if (!$adoptante || !$adoptante->cumpleRequisitos()) {
             echo "Selección inválida.\n";
@@ -60,7 +97,13 @@ class Adopciones {
 
         if ($respuesta === 's') {
             $animal->setEstado('Adoptado');
-            echo "\n✅ Adopción realizada con éxito.\n";
+            $fechaActual = date('Y-m-d'); // Fecha actual
+
+            // Crear un nuevo objeto Adopcion
+            $nuevaAdopcion = new Adopcion($animal->getId(), $adoptante->getId(), $fechaActual);
+            $db->agregarAdopcion($nuevaAdopcion); // Agregar a la DB
+
+            echo "\n✅ Adopción realizada con éxito. " . $nuevaAdopcion . "\n";
         } else {
             echo "\n❌ Adopción cancelada.\n";
         }

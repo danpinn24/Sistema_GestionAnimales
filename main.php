@@ -10,7 +10,6 @@ function salir() {
     mostrar("Saliendo del sistema...");
     exit;
 }
-
 function listarAnimales() {
     global $db;
     mostrar("===== Lista de Animales =====");
@@ -71,10 +70,11 @@ function verAdoptantesHabilitados() {
 
 function realizarAdopcion() {
     global $db;
-    $adopciones = new Adopciones();
-    $adopciones->realizarAdopcion($db->getAnimales(), $db->getAdoptantes());
+    $adopcionesManager = new AdopcionesManager(); // Usar la nueva clase manager
+    $adopcionesManager->realizarAdopcion($db->getAnimales(), $db->getAdoptantes(), $db); // Pasar $db
     leer("\nPresione ENTER para continuar...");
 }
+
 
 // === FUNCIONES DE GESTIÓN DE ANIMALES === //
 
@@ -234,7 +234,7 @@ function borrarAnimal() {
     leer("\nPresione ENTER para continuar...");
 }
 
-// En tu main.php o donde tengas las funciones del menú
+
 
 function verDetallesAnimal() {
     global $db; 
@@ -297,7 +297,7 @@ function verDetallesAnimal() {
 
     leer("\nPresione ENTER para continuar...");
 }
-// === FUNCIONES DE GESTIÓN DE ADOPTANTES (PENDIENTES DE IMPLEMENTAR LÓGICA) ===
+// === FUNCIONES DE GESTIÓN DE ADOPTANTES ===
 function registrarAdoptante() {
     global $db; 
 
@@ -496,12 +496,19 @@ function verDetallesAdoptante() {
 
     leer("\nPresione ENTER para continuar...");
 }
-// === FUNCIONES DE GESTIÓN DE ADOPCIONES ADICIONALES (PENDIENTES DE IMPLEMENTAR LÓGICA) ===
-
+// === FUNCIONES DE GESTIÓN DE ADOPCIONES  ===
 function verHistorialAdopciones() {
+    global $db; // Asegúrate de acceder a la instancia global de la base de datos
     mostrar("===== Historial de Adopciones =====");
-    mostrar("Función: Ver historial de adopciones (pendiente de implementar)");
-    // Aquí iría la lógica para mostrar las adopciones realizadas
+    $adopciones = $db->getAdopciones(); // Obtener el array de adopciones de la DB
+
+    if (empty($adopciones)) {
+        mostrar("No hay adopciones registradas todavía.");
+    } else {
+        foreach ($adopciones as $adopcion) {
+            echo $adopcion . "\n"; // Llama al método __toString() de la clase Adopcion
+        }
+    }
     leer("\nPresione ENTER para continuar...");
 }
 

@@ -2,6 +2,7 @@
 class DB {
     private $animales = [];
     private $adoptantes = [];
+    private $adopciones = []; // Nuevo array para almacenar objetos Adopcion
 
     public function agregarAnimal($animal) {
         $this->animales[] = $animal;
@@ -17,6 +18,16 @@ class DB {
 
     public function getAdoptantes() {
         return $this->adoptantes;
+    }
+
+    // Nuevo método para agregar una adopción
+    public function agregarAdopcion($adopcion) {
+        $this->adopciones[] = $adopcion;
+    }
+
+    // Nuevo método para obtener las adopciones
+    public function getAdopciones() {
+        return $this->adopciones;
     }
 
     public function modificarAnimalPorId($id, $nuevosDatos) {
