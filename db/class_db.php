@@ -2,7 +2,7 @@
 class DB {
     private $animales = [];
     private $adoptantes = [];
-    private $adopciones = []; // Nuevo array para almacenar objetos Adopcion
+    private $adopciones = []; 
 
     public function agregarAnimal($animal) {
         $this->animales[] = $animal;

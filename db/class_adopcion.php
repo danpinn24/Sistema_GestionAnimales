@@ -60,7 +60,7 @@ class AdopcionesManager { // Nueva clase para gestionar el proceso de adopción
 
         echo "Seleccione número de animal: ";
         $numAnimalIndex = intval(trim(fgets(STDIN))) - 1;
-        $animal = $listos[$numAnimalIndex] ?? null; // Obtener de $listos, no de $animales directamente
+        $animal = $listos[$numAnimalIndex] ?? null; 
 
         if (!$animal || strtolower($animal->getEstado()) !== 'listo para adopcion') {
             echo "Selección inválida.\n";
