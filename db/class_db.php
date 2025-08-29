@@ -2,7 +2,7 @@
 class DB {
     private $animales = [];
     private $adoptantes = [];
-    private $adopciones = []; 
+    private $adopciones = [];
 
     public function agregarAnimal($animal) {
         $this->animales[] = $animal;
@@ -20,14 +20,40 @@ class DB {
         return $this->adoptantes;
     }
 
-    // Nuevo método para agregar una adopción
     public function agregarAdopcion($adopcion) {
         $this->adopciones[] = $adopcion;
     }
 
-    // Nuevo método para obtener las adopciones
     public function getAdopciones() {
         return $this->adopciones;
+    }
+
+    // Nuevos métodos de búsqueda por ID
+    public function buscarAdopcionPorId($id) {
+        foreach ($this->adopciones as $adopcion) {
+            if ($adopcion->getIdAdopcion() === $id) {
+                return $adopcion;
+            }
+        }
+        return null;
+    }
+
+    public function buscarAnimalPorId($id) {
+        foreach ($this->animales as $animal) {
+            if ($animal->getId() === $id) {
+                return $animal;
+            }
+        }
+        return null;
+    }
+
+    public function buscarAdoptantePorId($id) {
+        foreach ($this->adoptantes as $adoptante) {
+            if ($adoptante->getId() === $id) {
+                return $adoptante;
+            }
+        }
+        return null;
     }
 
     public function modificarAnimalPorId($id, $nuevosDatos) {
@@ -107,4 +133,31 @@ public function eliminarAdoptante($indice) {
     }
 }
 
+public function eliminarAdopcion($indice) {
+    if (isset($this->adopciones[$indice])) {
+        array_splice($this->adopciones, $indice, 1);
+    }
+}
+
+
+public function modificarAdopcionPorId($id, $nuevosDatos) {
+    foreach ($this->adopciones as $adopcion) {
+        if ($adopcion->getIdAdopcion() == $id) {
+            if (isset($nuevosDatos['animalId']) && $nuevosDatos['animalId'] !== '') {
+                $adopcion->setAnimalId($nuevosDatos['animalId']);
+            }
+
+            if (isset($nuevosDatos['adoptanteId']) && $nuevosDatos['adoptanteId'] !== '') {
+                $adopcion->setAdoptanteId($nuevosDatos['adoptanteId']);
+            }
+
+            if (isset($nuevosDatos['fecha']) && $nuevosDatos['fecha'] !== '') {
+                $adopcion->setFechaAdopcion($nuevosDatos['fecha']);
+            }
+
+            return true;
+        }
+    }
+    return false;
+}
 }

@@ -1,7 +1,7 @@
 <?php
 require_once('./libreria/util.php');
 require_once('./libreria/menu.php');
-require_once('./db/loadDatos.php'); 
+require_once('./db/loadDatos.php');
 require_once('./db/class_adopcion.php');
 
 // === FUNCIONES PRINCIPALES ===
@@ -70,8 +70,8 @@ function verAdoptantesHabilitados() {
 
 function realizarAdopcion() {
     global $db;
-    $adopcionesManager = new AdopcionesManager(); // Usar la nueva clase manager
-    $adopcionesManager->realizarAdopcion($db->getAnimales(), $db->getAdoptantes(), $db); // Pasar $db
+    $adopcionesManager = new AdopcionesManager();
+    $adopcionesManager->realizarAdopcion($db->getAnimales(), $db->getAdoptantes(), $db);
     leer("\nPresione ENTER para continuar...");
 }
 
@@ -80,7 +80,7 @@ function realizarAdopcion() {
 
 
 function registrarAnimal() {
-    global $db; 
+    global $db;
 
     mostrar("===== Registrar Nuevo Animal =====");
 
@@ -112,10 +112,29 @@ function registrarAnimal() {
 
     $fechaIngreso = date('Y-m-d'); // Formato AAAA-MM-DD
 
-    mostrar("Ingrese el estado de adopción (ej. 'Listo para adopcion', 'En proceso', 'Adoptado'):");
-    $estado = leer();
+    do {
+    mostrar("Seleccione el estado de adopción: ");
+    mostrar("1. Listo para adopción");
+    mostrar("2. En proceso");
+    mostrar("3. Adoptado");
 
-  
+    $opcion = leer();
+
+    if ($opcion == "1") {
+        $estado = "Listo para adopción";
+    } elseif ($opcion == "2") {
+        $estado = "En proceso";
+    } elseif ($opcion == "3") {
+        $estado = "Adoptado";
+    } else {
+        mostrar(" Opción inválida. Intente de nuevo.\n");
+        $estado = null; // queda sin valor hasta que ponga bien
+    }
+
+} while ($estado === null);
+
+
+
     $nuevoAnimal = new Animal(
         $nombre,
         $especie,
@@ -127,8 +146,8 @@ function registrarAnimal() {
         $estado
     );
 
-   
-    $db->agregarAnimal($nuevoAnimal); 
+
+    $db->agregarAnimal($nuevoAnimal);
 
     mostrar("\nAnimal '" . $nuevoAnimal->getNombre() . "' (ID: " . $nuevoAnimal->getId() . ") registrado con éxito.");
 
@@ -237,7 +256,7 @@ function borrarAnimal() {
 
 
 function verDetallesAnimal() {
-    global $db; 
+    global $db;
 
     mostrar("===== Ver Detalles de Animal =====");
 
@@ -299,10 +318,10 @@ function verDetallesAnimal() {
 }
 // === FUNCIONES DE GESTIÓN DE ADOPTANTES ===
 function registrarAdoptante() {
-    global $db; 
+    global $db;
 
     mostrar("===== Registrar Nuevo Adoptante =====");
-    mostrar("Ingrese el nombre del adoptante:");
+    mostrar("Ingrese el nombre y apellido del adoptante:");
     $nombre = leer();
 
     mostrar("Ingrese el DNI del adoptante:");
@@ -331,7 +350,7 @@ function registrarAdoptante() {
             mostrar("Respuesta inválida. Por favor, ingrese 's' o 'n'.");
         }
     } while (true);
-    
+
     $nuevoAdoptante = new Adoptante(
         $nombre,
         $dni,
@@ -341,7 +360,7 @@ function registrarAdoptante() {
         $requisitosCumplidos
     );
 
-    $db->agregarAdoptante($nuevoAdoptante); 
+    $db->agregarAdoptante($nuevoAdoptante);
 
     mostrar("\nAdoptante '" . $nuevoAdoptante->getNombre() . "' (ID: " . $nuevoAdoptante->getId() . ") registrado con éxito.");
 
@@ -384,7 +403,7 @@ function modificarAdoptante() {
     $direccion = leer("Dirección [{$adoptanteEncontrado->getDireccion()}]:");
     $telefono = leer("Teléfono [{$adoptanteEncontrado->getTelefono()}]:");
     $email = leer("Email [{$adoptanteEncontrado->getEmail()}]:");
-    
+
     $requisitosActuales = $adoptanteEncontrado->cumpleRequisitos() ? 'Sí' : 'No';
     $requisitosInput = leer("¿Cumple requisitos? (s/n) [{$requisitosActuales}]:");
     $requisitosCumplidos = $adoptanteEncontrado->cumpleRequisitos(); // Mantener el valor actual por defecto
@@ -453,7 +472,7 @@ function borrarAdoptante() {
 }
 
 function verDetallesAdoptante() {
-    global $db; 
+    global $db;
 
     mostrar("===== Ver Detalles de Adoptante =====");
 
@@ -498,19 +517,168 @@ function verDetallesAdoptante() {
 }
 // === FUNCIONES DE GESTIÓN DE ADOPCIONES  ===
 function verHistorialAdopciones() {
-    global $db; // Asegúrate de acceder a la instancia global de la base de datos
+    global $db;
     mostrar("===== Historial de Adopciones =====");
-    $adopciones = $db->getAdopciones(); // Obtener el array de adopciones de la DB
+    $adopciones = $db->getAdopciones();
 
     if (empty($adopciones)) {
         mostrar("No hay adopciones registradas todavía.");
     } else {
         foreach ($adopciones as $adopcion) {
-            echo $adopcion . "\n"; // Llama al método __toString() de la clase Adopcion
+            echo $adopcion . "\n";
         }
     }
     leer("\nPresione ENTER para continuar...");
 }
+
+function verDetallesAdopcion() {
+    global $db;
+    mostrar("===== Ver Detalles de Adopción =====");
+
+    if (empty($db->getAdopciones())) {
+        mostrar("No hay adopciones registradas.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    mostrar("Ingrese el ID de la adopción que desea ver:");
+    $id = (int) leer();
+
+    $adopcion = $db->buscarAdopcionPorId($id);
+
+    if (!$adopcion) {
+        mostrar("No se encontró una adopción con ese ID.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    $animal = $db->buscarAnimalPorId($adopcion->getIdAnimal());
+    $adoptante = $db->buscarAdoptantePorId($adopcion->getIdAdoptante());
+
+    mostrar("\n--- Detalles de la Adopción ---");
+    mostrar("ID de Adopción: " . $adopcion->getIdAdopcion());
+    mostrar("Fecha de Adopción: " . $adopcion->getFechaAdopcion());
+    
+    mostrar("\n--- Detalles del Animal ---");
+    if ($animal) {
+        mostrar("ID: " . $animal->getId());
+        mostrar("Nombre: " . $animal->getNombre());
+        mostrar("Especie: " . $animal->getEspecie());
+        mostrar("Estado: " . $animal->getEstado());
+    } else {
+        mostrar("Animal no encontrado.");
+    }
+
+    mostrar("\n--- Detalles del Adoptante ---");
+    if ($adoptante) {
+        mostrar("ID: " . $adoptante->getId());
+        mostrar("Nombre: " . $adoptante->getNombre());
+        mostrar("Teléfono: " . $adoptante->getTelefono());
+        mostrar("Email: " . $adoptante->getEmail());
+    } else {
+        mostrar("Adoptante no encontrado.");
+    }
+
+    mostrar("-----------------------------");
+    leer("\nPresione ENTER para continuar...");
+}
+
+
+function modificarAdopcion() {
+    global $db;
+    mostrar("===== Modificar Adopción =====");
+
+    if (empty($db->getAdopciones())) {
+        mostrar("No hay adopciones registradas.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    mostrar("Ingrese el ID de la adopción a modificar:");
+    $id = (int) leer();
+
+    // Buscar la adopción
+    $adopcionEncontrada = null;
+    foreach ($db->getAdopciones() as $adopcion) {
+        if ($adopcion->getIdAdopcion() == $id) {
+            $adopcionEncontrada = $adopcion;
+            break;
+        }
+    }
+
+    if (!$adopcionEncontrada) {
+        mostrar("No se encontró una adopción con ese ID.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    // Mostrar valores actuales y permitir modificar
+    mostrar("Deje en blanco para mantener el valor actual.");
+
+    $animalId = leer("ID Animal [{$adopcionEncontrada->getIdAnimal()}]:");
+    $adoptanteId = leer("ID Adoptante [{$adopcionEncontrada->getIdAdoptante()}]:");
+    $fecha = leer("Fecha de adopción [{$adopcionEncontrada->getFechaAdopcion()}]:");
+
+    $nuevosDatos = [
+        'animalId' => $animalId !== '' ? (int)$animalId : $adopcionEncontrada->getIdAnimal(),
+        'adoptanteId' => $adoptanteId !== '' ? (int)$adoptanteId : $adopcionEncontrada->getIdAdoptante(),
+        'fecha' => $fecha !== '' ? $fecha : $adopcionEncontrada->getFechaAdopcion()
+    ];
+
+    $db->modificarAdopcionPorId($id, $nuevosDatos);
+
+    mostrar("✅ Adopción modificada con éxito.");
+    leer("\nPresione ENTER para continuar...");
+}
+
+// En el archivo main.php, reemplaza la función borrarAdopcion() con esto
+function borrarAdopcion() {
+    global $db;
+    mostrar("===== Borrar Adopción =====");
+
+    $adopciones = $db->getAdopciones();
+
+    if (empty($adopciones)) {
+        mostrar("No hay adopciones registradas para borrar.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    mostrar("Ingrese el ID de la adopción a borrar:");
+    $id = (int) leer();
+
+    // Buscar la adopción por ID usando el método de la clase DB
+    $adopcion = $db->buscarAdopcionPorId($id);
+
+    if (!$adopcion) {
+        mostrar("No se encontró ninguna adopción con ese ID.");
+        leer("\nPresione ENTER para continuar...");
+        return;
+    }
+
+    // Obtener el animal asociado a esta adopción
+    $animalAsociado = $db->buscarAnimalPorId($adopcion->getIdAnimal());
+    
+    mostrar("¿Estás segura/o de que querés borrar la adopción con ID {$id}? Esto hará que el animal vuelva a estar disponible. (s/n)");
+    $confirmar = strtolower(leer());
+
+    if ($confirmar === 's') {
+        // 1. Cambiar el estado del animal a "Listo para adopcion"
+        if ($animalAsociado) {
+            $animalAsociado->setEstado('Listo para adopcion');
+        }
+        
+        // 2. Eliminar la adopción del registro
+        $db->eliminarAdopcion($adopcion->getIdAdopcion()); // Usamos el ID de la adopción para buscarla y eliminarla
+
+        mostrar("✅ Adopción con ID {$id} eliminada con éxito y animal asociado marcado como 'Listo para adopción'.");
+    } else {
+        mostrar("❌ Operación cancelada.");
+    }
+
+    leer("\nPresione ENTER para continuar...");
+}
+
 
 
 // === MENÚS SECUNDARIOS ===
@@ -532,7 +700,7 @@ function menuAdopciones() {
 
 // Función auxiliar para ejecutar cualquier menú
 function ejecutarMenu($menu) {
-    global $db; 
+    global $db;
     do {
         $opcion = $menu->elegir();
         if ($opcion->getNombre() === 'Volver' || $opcion->getNombre() === 'Salir') {
@@ -549,5 +717,3 @@ function ejecutarMenu($menu) {
 mostrar("===== Sistema de Adopciones de Animales =====");
 $menu = Menu::getMenuPrincipal();
 ejecutarMenu($menu);
-
-?>

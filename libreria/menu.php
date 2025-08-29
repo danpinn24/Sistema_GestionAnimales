@@ -31,7 +31,6 @@ class Menu {
 
         return $this->opciones[$entrada];
     }
-
     
     static function getMenuPrincipal() {
         $menu = new Menu("Menú Principal");
@@ -44,7 +43,7 @@ class Menu {
 
     static function getMenuAnimales() {
         $menu = new Menu("Gestión de Animales");
-        $menu->addOpcion(new Opcion("Volver", "salir"));
+        $menu->addOpcion(new Opcion("Volver", "menuPrincipal"));
         $menu->addOpcion(new Opcion("Registrar nuevo animal", "registrarAnimal"));
         $menu->addOpcion(new Opcion("Modificar un animal", "modificarAnimal"));
         $menu->addOpcion(new Opcion("Borrar un animal", "borrarAnimal"));
@@ -55,7 +54,7 @@ class Menu {
 
     static function getMenuAdoptantes() {
         $menu = new Menu("Gestión de Adoptantes");
-        $menu->addOpcion(new Opcion("Volver", "salir"));
+        $menu->addOpcion(new Opcion("Volver", "menuPrincipal"));
         $menu->addOpcion(new Opcion("Registrar nuevo adoptante", "registrarAdoptante"));
         $menu->addOpcion(new Opcion("Modificar un adoptante", "modificarAdoptante"));
         $menu->addOpcion(new Opcion("Borrar un adoptante", "borrarAdoptante"));
@@ -66,12 +65,14 @@ class Menu {
 
     static function getMenuAdopciones() {
         $menu = new Menu("Gestión de Adopciones");
-        $menu->addOpcion(new Opcion("Volver", "salir"));
+        $menu->addOpcion(new Opcion("Volver", "menuPrincipal"));
         $menu->addOpcion(new Opcion("Ver animales disponibles", "verAnimalesDisponibles"));
         $menu->addOpcion(new Opcion("Ver adoptantes con requisitos cumplidos", "verAdoptantesHabilitados"));
         $menu->addOpcion(new Opcion("Realizar una adopción", "realizarAdopcion"));
+        $menu->addOpcion(new Opcion("Modificar una adopción", "modificarAdopcion"));
+        $menu->addOpcion(new Opcion("Borrar una adopción", "borrarAdopcion"));
         $menu->addOpcion(new Opcion("Ver historial de adopciones", "verHistorialAdopciones"));
+        $menu->addOpcion(new Opcion("Ver detalles de una adopción", "verDetallesAdopcion")); // Nueva opción
         return $menu;
     }
 }
-
